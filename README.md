@@ -104,11 +104,9 @@ live-sports/
 │   │   ├── components/
 │   │   ├── pages/
 │   │   ├── hooks/
-│   │   ├── App.tsx
 │   │   └── main.tsx
 │
 └── README.md
-
 
 ## Installation
 
@@ -166,5 +164,5 @@ GET /api/commentary/match/:matchId
 
 
 ## Author
-**Anirban Dutta**
+## **Anirban Dutta**
 
