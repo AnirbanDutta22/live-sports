@@ -7,7 +7,7 @@ It provides live match updates, commentary streaming, historical data access, an
 
 ## Project Overview
 
-LiveScore DS is designed to simulate a production-ready live sports tracking system where users can:
+LiveScore AD is designed to simulate a production-ready live sports tracking system where users can:
 
 - View ongoing and upcoming matches
 - Receive live score updates instantly
@@ -88,7 +88,7 @@ Whenever new commentary or score updates are created, subscribed users instantly
 ```
 
 ## Overall Project Structure
-
+```bash
 live-sports/
 │
 ├── server/
@@ -107,6 +107,7 @@ live-sports/
 │   │   └── main.tsx
 │
 └── README.md
+```
 
 ## Installation
 
@@ -145,13 +146,13 @@ npm dev
 ## API Endpoints
 
 ### Matches
-POST /api/matches
-GET /api/matches
-GET /api/matches/:id
+#### POST /api/matches
+#### GET /api/matches
+#### GET /api/matches/:id
 
 ### Commentary
-POST /api/commentary
-GET /api/commentary/match/:matchId
+#### POST /api/commentary
+#### GET /api/commentary/match/:matchId
 
 ### Future Improvements
 1. Authentication & Admin Panel
@@ -164,5 +165,5 @@ GET /api/commentary/match/:matchId
 
 
 ## Author
-## **Anirban Dutta**
+**Anirban Dutta**
 
