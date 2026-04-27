@@ -7,7 +7,7 @@ export const matchService = {
     const newMatch = await matchRepository.create(data);
 
     // NOTIFY EVERYONE!
-    SocketService.broadcast("MATCH_CREATED", newMatch);
+    SocketService.broadcastAll("MATCH_CREATED", newMatch);
 
     return newMatch;
   },
