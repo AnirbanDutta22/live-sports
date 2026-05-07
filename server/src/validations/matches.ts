@@ -26,5 +26,12 @@ export const listQueryMatchesSchema = z.object({
   limit: z.coerce.number().int().positive().max(100).optional(),
 });
 
+export const updateScoreSchema = z.object({
+  matchId: z.number(),
+  homeScore: z.coerce.number().int().nonnegative().optional(),
+  awayScore: z.coerce.number().int().nonnegative().optional(),
+});
+
 // Extract the ts type from this Zod schema
 export type MatchData = z.infer<typeof createMatchSchema>;
+export type ScoreData = z.infer<typeof updateScoreSchema>;

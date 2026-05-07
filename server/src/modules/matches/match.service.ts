@@ -1,5 +1,5 @@
 import { SocketService } from "../../sockets/socket.service";
-import { MatchData } from "../../validations/matches";
+import { MatchData, ScoreData } from "../../validations/matches";
 import { matchRepository } from "./match.repository";
 
 export const matchService = {
@@ -13,5 +13,20 @@ export const matchService = {
   },
   async findMatch(limit: number) {
     return await matchRepository.find(limit);
+  },
+  async findOneMatch(matchId: number) {
+    return await matchRepository.findOne(matchId);
+  },
+  async updateMatchScore(data: ScoreData) {
+    const updatedScore = await matchRepository.updateScore(data);
+
+    // NOTIFY
+    SocketService.broadcastToMatch(
+      updatedScore.matchId,
+      "SCORE_UPDATED",
+      updatedScore,
+    );
+
+    return updatedScore;
   },
 };

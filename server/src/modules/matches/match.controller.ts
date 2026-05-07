@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
   createMatchSchema,
   listQueryMatchesSchema,
+  updateScoreSchema,
 } from "../../validations/matches";
 import { matchService } from "./match.service";
 
@@ -30,6 +31,30 @@ export const matchController = {
         .json({ error: "Failed to create match", details: error.message });
     }
   },
+
+  async updateScore(req: Request, res: Response) {
+    // Parse the body using Zod
+    const parsed = updateScoreSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      // Use flatten() to get errors grouped by field name
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      return res.status(400).json({
+        error: "Invalid Payload",
+        details: fieldErrors,
+      });
+    }
+
+    try {
+      const score = await matchService.updateMatchScore(parsed.data);
+      res.status(201).json(score);
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ error: "Failed to update score", details: error.message });
+    }
+  },
+
   async find(req: Request, res: Response) {
     const parsed = listQueryMatchesSchema.safeParse(req.query);
 
@@ -45,6 +70,21 @@ export const matchController = {
 
     try {
       const matches = await matchService.findMatch(limit);
+      res.status(200).json(matches);
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ error: "Failed to list matches", details: error.message });
+    }
+  },
+
+  async findOne(req: Request, res: Response) {
+    const matchId = parseInt(req.params.matchId as string);
+    if (isNaN(matchId))
+      return res.status(400).json({ error: "Invalid match ID" });
+
+    try {
+      const matches = await matchService.findOneMatch(matchId);
       res.status(200).json(matches);
     } catch (error: any) {
       res
