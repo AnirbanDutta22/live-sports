@@ -1,9 +1,13 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Header } from './components/Header';
-import { DashboardPage } from './pages/DashboardPage';
-import { MatchDetailPage } from './pages/MatchDetailPage';
-import { NotFoundPage } from './pages/NotFoundPage';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Header } from "./components/Header";
+import { DashboardPage } from "./pages/DashboardPage";
+import { MatchDetailPage } from "./pages/MatchDetailPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
+import { AdminLayout } from "./admin/components/AdminLayout";
+import { AdminOverviewPage } from "./admin/pages/AdminOverviewPage";
+import { AdminMatchesPage } from "./admin/pages/AdminMatchesPage";
+import { AdminMatchDetailPage } from "./admin/pages/AdminMatchDetailPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +38,20 @@ export function App() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/match/:id" element={<MatchDetailPage />} />
               <Route path="*" element={<NotFoundPage />} />
+              {/* ADMIN ROUTES (Using AdminLayout) */}
+              <Route path="/admin" element={<AdminLayout />}>
+                {/* This renders at /admin */}
+                <Route index element={<AdminOverviewPage />} />
+
+                {/* This renders at /admin/matches */}
+                <Route path="matches" element={<AdminMatchesPage />} />
+
+                {/* This renders at /admin/commentary/:id */}
+                <Route
+                  path="commentary/:id"
+                  element={<AdminMatchDetailPage />}
+                />
+              </Route>
             </Routes>
           </main>
         </div>

@@ -1,5 +1,5 @@
 // Match types
-export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed';
+export type MatchStatus = "scheduled" | "live" | "finished" | "postponed";
 
 export interface Match {
   id: number;
@@ -18,23 +18,29 @@ export interface Match {
   competition?: string;
 }
 
+export interface Score {
+  matchId: number;
+  homeScore: number;
+  awayScore: number;
+}
+
 // Commentary types
 export type CommentaryEventType =
-  | 'goal'
-  | 'yellow_card'
-  | 'red_card'
-  | 'substitution'
-  | 'kickoff'
-  | 'halftime'
-  | 'fulltime'
-  | 'penalty'
-  | 'var'
-  | 'injury'
-  | 'corner'
-  | 'foul'
-  | 'offside'
-  | 'save'
-  | 'comment';
+  | "goal"
+  | "yellow_card"
+  | "red_card"
+  | "substitution"
+  | "kickoff"
+  | "halftime"
+  | "fulltime"
+  | "penalty"
+  | "var"
+  | "injury"
+  | "corner"
+  | "foul"
+  | "offside"
+  | "save"
+  | "comment";
 
 export interface Commentary {
   id: number;
@@ -48,14 +54,20 @@ export interface Commentary {
 }
 
 // WebSocket message types
-export type WsAction = 'SUBSCRIBE' | 'UNSUBSCRIBE';
+export type WsAction = "SUBSCRIBE" | "UNSUBSCRIBE";
 
 export interface WsClientMessage {
   action: WsAction;
   matchId: number;
 }
 
-export type WsEventType = 'WELCOME' | 'MATCH_CREATED' | 'NEW_COMMENTARY' | 'MATCH_UPDATED' | 'ERROR';
+export type WsEventType =
+  | "WELCOME"
+  | "MATCH_CREATED"
+  | "NEW_COMMENTARY"
+  | "MATCH_UPDATED"
+  | "SCORE_UPDATED"
+  | "ERROR";
 
 export interface WsServerMessage<T = unknown> {
   event: WsEventType;
@@ -63,4 +75,8 @@ export interface WsServerMessage<T = unknown> {
 }
 
 // Connection state
-export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
+export type ConnectionStatus =
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";

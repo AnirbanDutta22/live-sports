@@ -1,9 +1,9 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { useWebSocket } from './useWebSocket';
-import type { Match, WsServerMessage } from '../types';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useWebSocket } from "./useWebSocket";
+import type { Match, Score, WsServerMessage } from "../types";
 
-const MATCHES_KEY = ['matches'] as const;
+const MATCHES_KEY = ["matches"] as const;
 
 async function fetchMatches(limit = 50): Promise<Match[]> {
   const res = await fetch(`/api/matches?limit=${limit}`);
@@ -15,7 +15,7 @@ export function useMatches(limit = 50) {
   const queryClient = useQueryClient();
 
   const handleMessage = (msg: WsServerMessage) => {
-    if (msg.event === 'MATCH_CREATED') {
+    if (msg.event === "MATCH_CREATED") {
       const newMatch = msg.data as Match;
       queryClient.setQueryData<Match[]>(MATCHES_KEY, (old = []) => {
         // Prepend and deduplicate
@@ -25,10 +25,10 @@ export function useMatches(limit = 50) {
       });
     }
 
-    if (msg.event === 'MATCH_UPDATED') {
+    if (msg.event === "MATCH_UPDATED") {
       const updated = msg.data as Match;
       queryClient.setQueryData<Match[]>(MATCHES_KEY, (old = []) =>
-        old.map((m) => (m.id === updated.id ? { ...m, ...updated } : m))
+        old.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)),
       );
     }
   };
@@ -50,11 +50,44 @@ export function useMatch(matchId: number) {
   const queryClient = useQueryClient();
 
   const handleMessage = (msg: WsServerMessage) => {
-    if (msg.event === 'MATCH_UPDATED') {
+    if (msg.event === "MATCH_UPDATED") {
       const updated = msg.data as Match;
       if (updated.id === matchId) {
-        queryClient.setQueryData<Match[]>(['matches'], (old = []) =>
-          old.map((m) => (m.id === matchId ? { ...m, ...updated } : m))
+        queryClient.setQueryData<Match[]>(["matches"], (old = []) =>
+          old.map((m) => (m.id === matchId ? { ...m, ...updated } : m)),
+        );
+      }
+    }
+
+    if (msg.event === "SCORE_UPDATED") {
+      const updatedData = msg.data as Score;
+
+      if (updatedData.matchId === matchId) {
+        // 1. Update the 'matches' list cache (Dashboard)
+        queryClient.setQueryData<Match[]>(["matches"], (old = []) =>
+          old.map((m) =>
+            m.id === updatedData.matchId
+              ? {
+                  ...m,
+                  homeScore: updatedData.homeScore,
+                  awayScore: updatedData.awayScore,
+                }
+              : m,
+          ),
+        );
+
+        // 2. Update the specific match detail cache (MatchDetailPage)
+        // This ensures that if the user is looking at the scoreboard, it updates instantly.
+        queryClient.setQueryData<Match>(
+          ["match", updatedData.matchId],
+          (old) => {
+            if (!old) return old;
+            return {
+              ...old,
+              homeScore: updatedData.homeScore,
+              awayScore: updatedData.awayScore,
+            };
+          },
         );
       }
     }
@@ -63,7 +96,7 @@ export function useMatch(matchId: number) {
   useWebSocket(handleMessage);
 
   const matchesQuery = useQuery({
-    queryKey: ['matches'],
+    queryKey: ["matches"],
     queryFn: () => fetchMatches(100),
     staleTime: 30_000,
   });
@@ -74,16 +107,22 @@ export function useMatch(matchId: number) {
       fetch(`/api/matches/${matchId}`)
         .then((r) => r.json())
         .then((match: Match) => {
-          queryClient.setQueryData<Match[]>(['matches'], (old = []) => {
+          queryClient.setQueryData<Match[]>(["matches"], (old = []) => {
             const exists = old.some((m) => m.id === matchId);
             if (exists) return old;
             return [...old, match];
           });
         })
-        .catch(() => {/* ignore */});
+        .catch(() => {
+          /* ignore */
+        });
     }
   }, [matchId, matchesQuery.data, queryClient]);
 
   const match = matchesQuery.data?.find((m) => m.id === matchId);
-  return { match, isLoading: matchesQuery.isLoading, error: matchesQuery.error };
+  return {
+    match,
+    isLoading: matchesQuery.isLoading,
+    error: matchesQuery.error,
+  };
 }
